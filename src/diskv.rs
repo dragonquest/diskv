@@ -3,9 +3,9 @@ use std::fs::create_dir_all;
 use string_error::*;
 use std::path::*;
 use std::io::Write;
-use std::fs::read;
 
 use crate::Index;
+use crate::index::IndexResult;
 
 pub type ErrorResult<T> = Result<T, Box<dyn Error>>;
 
@@ -19,15 +19,15 @@ pub struct Diskv {
 }
 
 impl Diskv {
-    pub fn write_str(&self, key: &'static str, value: &'static str) -> ErrorResult<()> {
+    pub fn write_str(&mut self, key: &'static str, value: &'static str) -> ErrorResult<()> {
         self.write(key, value.as_bytes())
     }
 
-    pub fn write_string(&self, key: &'static str, value: String) -> ErrorResult<()> {
+    pub fn write_string(&mut self, key: &'static str, value: String) -> ErrorResult<()> {
         self.write(key, value.as_bytes())
     }
 
-    pub fn write(&self, key: &'static str, value: &[u8]) -> ErrorResult<()> {
+    pub fn write(&mut self, key: &'static str, value: &[u8]) -> ErrorResult<()> {
         let key_path = Path::new(&self.options.base_dir).join(key);
 
         let file = std::fs::File::create(key_path);
@@ -42,19 +42,49 @@ impl Diskv {
             return Err(Box::new(e));
         }
 
+        if let Some(index) = &mut self.options.index {
+            let resp = index.set(key, value);
+
+            if let IndexResult::Error(err_msg) = resp {
+                let err = string_error::new_err(err_msg.as_ref());
+                return Err(err);
+            }
+        }
+
         return Ok(());
     }
 
-    pub fn read(&self, key: &'static str) -> ErrorResult<Vec<u8>> {
+    pub fn read(&mut self, key: &'static str) -> ErrorResult<Vec<u8>> {
+
+        if let Some(index) = &mut self.options.index {
+            let resp = index.get(key);
+
+            if let IndexResult::Error(err_msg) = resp {
+                let err = string_error::new_err(err_msg.as_ref());
+                return Err(err);
+            } else if let IndexResult::Found(v) = resp {
+                return Ok(v);
+            }
+        }
+
         let key_path = Path::new(&self.options.base_dir).join(key);
 
-        match read(key_path) {
+        match std::fs::read(key_path) {
             Err(e) => Err(Box::new(e)),
             Ok(data) => Ok(data),
         }
     }
 
-    pub fn delete(&self, key: &'static str) -> ErrorResult<()> {
+    pub fn delete(&mut self, key: &'static str) -> ErrorResult<()> {
+        if let Some(index) = &mut self.options.index {
+            let resp = index.delete(key);
+
+            if let IndexResult::Error(err_msg) = resp {
+                let err = string_error::new_err(err_msg.as_ref());
+                return Err(err);
+            }
+        }
+
         let key_path = Path::new(&self.options.base_dir).join(key);
 
         if !key_path.exists() {

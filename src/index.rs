@@ -3,10 +3,13 @@ use std::fmt;
 pub mod multiindex;
 pub use multiindex::MultiIndex as MultiIndex;
 
+pub mod lruindex;
+pub use lruindex::LruIndex as LruIndex;
+
 pub trait Index {
-    fn get(&self, key: &'static str) -> IndexResult;
-    fn set(&self, key: &'static str, value: &[u8]) -> IndexResult;
-    fn delete(&self, key: &'static str) -> IndexResult;
+    fn get(&mut self, key: &'static str) -> IndexResult;
+    fn set(&mut self, key: &'static str, value: &[u8]) -> IndexResult;
+    fn delete(&mut self, key: &'static str) -> IndexResult;
 }
 
 /// Index result
