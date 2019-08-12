@@ -1,10 +1,10 @@
 use std::fmt;
 
 pub mod multiindex;
-pub use multiindex::MultiIndex as MultiIndex;
+pub use multiindex::MultiIndex;
 
 pub mod lruindex;
-pub use lruindex::LruIndex as LruIndex;
+pub use lruindex::LruIndex;
 
 pub trait Index {
     fn get(&mut self, key: &'static str) -> IndexResult;

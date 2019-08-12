@@ -4,28 +4,21 @@ pub use super::IndexResult;
 use lru_cache::LruCache;
 use std::vec::*;
 
-pub struct LruIndex
-{
+pub struct LruIndex {
     cache: LruCache<&'static str, Vec<u8>>,
 }
 
-impl LruIndex
-{
+impl LruIndex {
     pub fn new(capacity: usize) -> Box<dyn Index> {
-        let cache = LruCache::<&'static str,Vec<u8>>::new(capacity);
-        let lru = LruIndex {
-            cache: cache, 
-        };
+        let cache = LruCache::<&'static str, Vec<u8>>::new(capacity);
+        let lru = LruIndex { cache: cache };
 
         Box::new(lru)
     }
 }
 
-impl Index for LruIndex
-{
+impl Index for LruIndex {
     fn get(&mut self, key: &'static str) -> IndexResult {
-        println!("CACHE LEN: {}", self.cache.len());
-
         let found = self.cache.get_mut(key);
 
         if let Some(v) = found {

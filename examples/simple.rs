@@ -1,7 +1,7 @@
 use diskv;
 
-use diskv::index::MultiIndex;
 use diskv::index::LruIndex;
+use diskv::index::MultiIndex;
 
 fn main() {
     // let db = diskv::simple("./db1").unwrap();

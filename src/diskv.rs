@@ -1,11 +1,11 @@
 use std::error::Error;
 use std::fs::create_dir_all;
-use string_error::*;
-use std::path::*;
 use std::io::Write;
+use std::path::*;
+use string_error::*;
 
-use crate::Index;
 use crate::index::IndexResult;
+use crate::Index;
 
 pub type ErrorResult<T> = Result<T, Box<dyn Error>>;
 
@@ -55,7 +55,6 @@ impl Diskv {
     }
 
     pub fn read(&mut self, key: &'static str) -> ErrorResult<Vec<u8>> {
-
         if let Some(index) = &mut self.options.index {
             let resp = index.get(key);
 
@@ -100,11 +99,13 @@ impl Diskv {
 
 pub fn new(options: Options) -> ErrorResult<Diskv> {
     let db = Diskv { options };
-    
+
     let created_dir = create_dir_all(&db.options.base_dir);
 
     if let Err(e) = created_dir {
-        return Err(new_err(&format!("Failed to create '{}': {}", &db.options.base_dir, e).to_string()));
+        return Err(new_err(
+            &format!("Failed to create '{}': {}", &db.options.base_dir, e).to_string(),
+        ));
     }
 
     Ok(db)
@@ -121,7 +122,9 @@ pub fn simple(base_dir: &'static str) -> ErrorResult<Diskv> {
     let created_dir = create_dir_all(&db.options.base_dir);
 
     if let Err(e) = created_dir {
-        return Err(new_err(&format!("Failed to create '{}': {}", &db.options.base_dir, e).to_string()));
+        return Err(new_err(
+            &format!("Failed to create '{}': {}", &db.options.base_dir, e).to_string(),
+        ));
     }
 
     Ok(db)
