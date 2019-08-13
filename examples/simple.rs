@@ -11,7 +11,7 @@ fn main() {
 
     let options = diskv::Options {
         base_dir: "./db1".to_string(),
-        index: Some(mi),
+        index: Some(Box::new(mi)),
     };
 
     let mut db = diskv::new(options).unwrap();

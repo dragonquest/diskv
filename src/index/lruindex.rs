@@ -9,11 +9,11 @@ pub struct LruIndex {
 }
 
 impl LruIndex {
-    pub fn new(capacity: usize) -> Box<dyn Index> {
+    pub fn new(capacity: usize) -> impl Index {
         let cache = LruCache::<&'static str, Vec<u8>>::new(capacity);
         let lru = LruIndex { cache: cache };
 
-        Box::new(lru)
+        lru
     }
 }
 

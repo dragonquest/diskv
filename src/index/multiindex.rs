@@ -2,19 +2,19 @@ pub use super::Index;
 pub use super::IndexResult;
 
 /// MultiIndex is an Index that can hold more chained indices
-pub struct MultiIndex {
-    indices: Vec<Box<dyn Index>>,
+pub struct MultiIndex<I: Index> {
+    indices: Vec<I>,
 }
 
-impl MultiIndex {
-    pub fn new(indices: Vec<Box<dyn Index>>) -> Box<dyn Index> {
+impl<I: Index> MultiIndex<I> {
+    pub fn new(indices: Vec<I>) -> impl Index {
         let mi = MultiIndex { indices: indices };
 
-        Box::new(mi)
+        mi
     }
 }
 
-impl Index for MultiIndex {
+impl<I: Index> Index for MultiIndex<I> {
     /// get iterates through all indices and returns the first value found.
     /// If an error has occured then it returns IndexResult::Error.
     /// If nothing found it returns IndexResult::NotFound
